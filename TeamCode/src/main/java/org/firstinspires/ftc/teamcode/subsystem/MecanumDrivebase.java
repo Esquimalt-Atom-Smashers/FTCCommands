@@ -2,9 +2,6 @@ package org.firstinspires.ftc.teamcode.subsystem;
 
 
 import com.qualcomm.hardware.bosch.BHI260IMU;
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.kauailabs.NavxMicroNavigationSensor;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -13,19 +10,19 @@ import org.firstinspires.ftc.teamcode.command.Command;
 import org.firstinspires.ftc.teamcode.command.ConditionalRunCommand;
 import org.firstinspires.ftc.teamcode.command.InstantCommand;
 import org.firstinspires.ftc.teamcode.command.RunCommand;
-import org.firstinspires.ftc.teamcode.hardware.GyroWrapper;
+import org.firstinspires.ftc.teamcode.hardware.BHI260IMUImpl;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-public class MecanumDrivebaseSubsystem extends SubsystemBase {
+public class MecanumDrivebase extends SubsystemBase {
     private final DcMotorEx[] motors;
     private boolean fieldCentric;
-    private GyroWrapper gyro;
+    private BHI260IMUImpl gyro;
 
-    public MecanumDrivebaseSubsystem(DcMotorEx frontLeftMotor, DcMotorEx frontRightMotor, DcMotorEx rearLeftMotor, DcMotorEx rearRightMotor, BHI260IMU gyro) {
+    public MecanumDrivebase(DcMotorEx frontLeftMotor, DcMotorEx frontRightMotor, DcMotorEx rearLeftMotor, DcMotorEx rearRightMotor,
+                            BHI260IMU gyro, IMU.Parameters parameters, Subsystem parent) {
         motors = new DcMotorEx[]{frontLeftMotor, frontRightMotor, rearLeftMotor, rearRightMotor};
-        this.gyro = new GyroWrapper(gyro);
+        this.gyro = new BHI260IMUImpl(gyro, parameters);
         resetEncoders();
     }
 
