@@ -25,7 +25,7 @@ public class BHI260IMUImpl {
         reset();
     }
 
-    private void reset() {
+    public void reset() {
         gyro.resetYaw();
     }
 }

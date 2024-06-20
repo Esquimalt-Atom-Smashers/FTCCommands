@@ -18,11 +18,13 @@ public class MecanumDrivebase extends SubsystemBase {
     private final DcMotorEx[] motors;
     private boolean fieldCentric;
     private BHI260IMUImpl gyro;
+    private Subsystem[] requirements;
 
     public MecanumDrivebase(DcMotorEx frontLeftMotor, DcMotorEx frontRightMotor, DcMotorEx rearLeftMotor, DcMotorEx rearRightMotor,
-                            BHI260IMU gyro, IMU.Parameters parameters, Subsystem parent) {
+                            BHI260IMU gyro, IMU.Parameters parameters, Subsystem... requirements) {
         motors = new DcMotorEx[]{frontLeftMotor, frontRightMotor, rearLeftMotor, rearRightMotor};
         this.gyro = new BHI260IMUImpl(gyro, parameters);
+        this.requirements = requirements;
         resetEncoders();
     }
 
@@ -55,18 +57,22 @@ public class MecanumDrivebase extends SubsystemBase {
         return new ConditionalRunCommand(
                 driveFieldRelativeCommand(forwardSupplier, strafeSupplier, rotateSupplier),
                 driveRobotRelativeCommand(forwardSupplier, strafeSupplier, rotateSupplier),
-                () -> fieldCentric);
+                () -> fieldCentric, requirements);
     }
 
     public Command driveFieldRelativeCommand(DoubleSupplier forwardSupplier, DoubleSupplier strafeSupplier, DoubleSupplier rotateSupplier) {
-        return new RunCommand(() -> driveFieldRelative(forwardSupplier.getAsDouble(), strafeSupplier.getAsDouble(), rotateSupplier.getAsDouble()));
+        return new RunCommand(() -> driveFieldRelative(forwardSupplier.getAsDouble(), strafeSupplier.getAsDouble(), rotateSupplier.getAsDouble()), requirements);
     }
 
     public Command driveRobotRelativeCommand(DoubleSupplier forwardSupplier, DoubleSupplier strafeSupplier, DoubleSupplier rotateSupplier) {
-        return new RunCommand(() -> driveRobotRelative(forwardSupplier.getAsDouble(), strafeSupplier.getAsDouble(), rotateSupplier.getAsDouble()));
+        return new RunCommand(() -> driveRobotRelative(forwardSupplier.getAsDouble(), strafeSupplier.getAsDouble(), rotateSupplier.getAsDouble()), requirements);
     }
 
     public Command setFieldCentricCommand(boolean fieldCentric) {
         return new InstantCommand(() -> this.fieldCentric = fieldCentric);
+    }
+
+    public Command resetGyro() {
+        return new InstantCommand(() -> gyro.reset());
     }
 }
