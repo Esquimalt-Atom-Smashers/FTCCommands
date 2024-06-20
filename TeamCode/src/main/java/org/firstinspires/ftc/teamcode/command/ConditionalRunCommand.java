@@ -15,7 +15,7 @@ public class ConditionalRunCommand extends CommandBase {
         this.command2 = command2;
         this.condition = condition;
         
-        addRequirement(requirements);
+        addRequirements(requirements);
     }
     
     public ConditionalRunCommand(Command command, BooleanSupplier condition, Subsystem... requirements) {

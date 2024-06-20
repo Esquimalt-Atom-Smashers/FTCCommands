@@ -9,7 +9,7 @@ public class RunCommand extends CommandBase {
     public RunCommand(Runnable toRun, Subsystem... requirements) {
         this.toRun = toRun;
         
-        addRequirement(requirements);
+        addRequirements(requirements);
     }
     
     @Override

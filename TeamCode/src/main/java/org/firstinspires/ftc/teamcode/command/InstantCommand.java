@@ -9,7 +9,7 @@ public class InstantCommand extends CommandBase {
     public InstantCommand(Runnable toRun, Subsystem... requirements) {
         this.toRun = toRun;
         
-        addRequirement(requirements);
+        addRequirements(requirements);
     }
     
     @Override

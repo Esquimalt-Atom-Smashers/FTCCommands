@@ -7,6 +7,8 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.Exposur
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.teamcode.command.Command;
 import org.firstinspires.ftc.teamcode.command.InstantCommand;
+import org.firstinspires.ftc.teamcode.command.ParallelDeadlineCommand;
+import org.firstinspires.ftc.teamcode.command.RunCommand;
 import org.firstinspires.ftc.teamcode.command.SequentialCommandGroup;
 import org.firstinspires.ftc.teamcode.command.WaitUntilCommand;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -40,21 +42,24 @@ public class AprilTagCamera {
     }
 
     /** Keep detecting a tag until a tag is found. */
-    public Command detectTag(int desiredTag, Runnable detectionAction) {
+    public Command detectTagCommand(int desiredTag, Runnable detectionAction) {
         if (!isInitialized) return null;
 
-        List<AprilTagDetection> currentDetections = processor.getDetections();
+        return new ParallelDeadlineCommand(
+                    new WaitUntilCommand(() -> isTagFound, true),
+                    new RunCommand(() -> {
+                        List<AprilTagDetection> currentDetections = processor.getDetections();
 
-        for (AprilTagDetection detection : currentDetections) {
-            if (detection.metadata != null) {
-                if ((desiredTag < 0) || (detection.id == desiredTag)) {
-                    isTagFound = true;
-                    detectedTag = detection;
-                }
-            }
-        }
-//        return new SequentialCommandGroup(new WaitUntilCommand(() -> isTagFound, true))
-        return new InstantCommand(() -> System.out.println("test"));
+                        for (AprilTagDetection detection : currentDetections) {
+                            if (detection.metadata != null) {
+                                if ((desiredTag < 0) || (detection.id == desiredTag)) {
+                                    isTagFound = true;
+                                    detectedTag = detection;
+                                }
+                            }
+                        }
+                    })
+                );
     }
 
     public boolean isTagFound() {

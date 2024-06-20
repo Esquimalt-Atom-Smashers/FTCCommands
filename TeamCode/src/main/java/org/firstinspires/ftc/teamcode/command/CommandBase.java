@@ -12,7 +12,7 @@ public abstract class CommandBase implements Command {
     protected String subsystem = "Ungrouped";
     protected Set<Subsystem> requirements = new HashSet<>();
 
-    public final void addRequirement(Subsystem... requirements) {
+    public final void addRequirements(Subsystem... requirements) {
         this.requirements.addAll(Arrays.asList(requirements));
     }
 
