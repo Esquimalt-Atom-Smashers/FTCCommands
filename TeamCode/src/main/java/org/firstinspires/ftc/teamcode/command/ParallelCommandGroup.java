@@ -4,33 +4,22 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ParallelDeadlineCommand extends CommandGroupBase {
+public class ParallelCommandGroup extends CommandGroupBase {
 
     private final Map<Command, Boolean> commands = new HashMap<>();
-    private boolean runsWhenDisabled = true;
-    private Command deadline;
+    private boolean runWhenDisabled = true;
 
-    public ParallelDeadlineCommand(Command deadline, Command... commands) {
-        this.deadline = deadline;
+    public ParallelCommandGroup(Command... commands) {
         addCommands(commands);
-        if (!this.commands.containsKey(deadline)) {
-            addCommands(deadline);
-        }
-    }
-
-    public void setDeadline(Command deadline) {
-        if (!commands.containsKey(deadline)) {
-            addCommands(deadline);
-        }
-        this.deadline = deadline;
     }
 
     @Override
-    public void addCommands(Command... commands) {
+    public final void addCommands(Command... commands) {
         requireUngrouped(commands);
 
         if (this.commands.containsValue(true)) {
-            throw new IllegalStateException("Commands cannot be added to a CommandGroup while the group is running");
+            throw new IllegalStateException(
+                    "Commands cannot be added to a CommandGroup while the group is running");
         }
 
         registerGroupedCommands(commands);
@@ -41,7 +30,7 @@ public class ParallelDeadlineCommand extends CommandGroupBase {
             }
             this.commands.put(command, false);
             requirements.addAll(command.getRequirements());
-            runsWhenDisabled &= command.runsWhenDisabled();
+            runWhenDisabled &= command.runsWhenDisabled();
         }
     }
 
@@ -69,20 +58,22 @@ public class ParallelDeadlineCommand extends CommandGroupBase {
 
     @Override
     public void end(boolean interrupted) {
-        for (Map.Entry<Command, Boolean> commandRunning : commands.entrySet()) {
-            if (commandRunning.getValue()) {
-                commandRunning.getKey().end(true);
+        if (interrupted) {
+            for (Map.Entry<Command, Boolean> commandRunning : commands.entrySet()) {
+                if (commandRunning.getValue()) {
+                    commandRunning.getKey().end(true);
+                }
             }
         }
     }
 
     @Override
     public boolean isFinished() {
-        return deadline.isFinished();
+        return !commands.containsValue(true);
     }
 
     @Override
     public boolean runsWhenDisabled() {
-        return runsWhenDisabled;
+        return runWhenDisabled;
     }
 }

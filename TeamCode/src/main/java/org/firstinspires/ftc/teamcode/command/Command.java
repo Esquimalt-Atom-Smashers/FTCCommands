@@ -45,6 +45,26 @@ public interface Command {
         return false;
     }
 
+    default Command andThen(Command... next) {
+        SequentialCommandGroup group = new SequentialCommandGroup(this);
+        group.addCommands(next);
+        return group;
+    }
+
+    default Command alongWith(Command... parallel) {
+        ParallelCommandGroup group = new ParallelCommandGroup(this);
+        group.addCommands(parallel);
+        return group;
+    }
+
+    default Command deadlineFor(Command... parallel) {
+        ParallelDeadlineCommandGroup group = new ParallelDeadlineCommandGroup(this, parallel);
+        group.addCommands(parallel);
+        return group;
+    }
+
+    // TODO: RaceWith, withTimeout, interruptOn, whenFinished, beforeStarting,
+
     default String getName() {
         return this.getClass().getSimpleName();
     }

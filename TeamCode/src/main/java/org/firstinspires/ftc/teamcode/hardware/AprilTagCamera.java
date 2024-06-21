@@ -6,10 +6,8 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.teamcode.command.Command;
-import org.firstinspires.ftc.teamcode.command.InstantCommand;
-import org.firstinspires.ftc.teamcode.command.ParallelDeadlineCommand;
+import org.firstinspires.ftc.teamcode.command.ParallelDeadlineCommandGroup;
 import org.firstinspires.ftc.teamcode.command.RunCommand;
-import org.firstinspires.ftc.teamcode.command.SequentialCommandGroup;
 import org.firstinspires.ftc.teamcode.command.WaitUntilCommand;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -45,7 +43,7 @@ public class AprilTagCamera {
     public Command detectTagCommand(int desiredTag, Runnable detectionAction) {
         if (!isInitialized) return null;
 
-        return new ParallelDeadlineCommand(
+        return new ParallelDeadlineCommandGroup(
                     new WaitUntilCommand(() -> isTagFound, true),
                     new RunCommand(() -> {
                         List<AprilTagDetection> currentDetections = processor.getDetections();
